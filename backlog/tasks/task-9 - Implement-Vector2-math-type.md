@@ -1,9 +1,10 @@
 ---
 id: TASK-9
 title: Implement Vector2 math type
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-09-22 12:31'
+updated_date: '2026-09-22 13:44'
 labels:
   - engine
 milestone: m-1
@@ -25,3 +26,9 @@ Immutable-friendly Vector2 with add, subtract, multiplyScalar, length, normalize
 - [ ] #1 All Vector2 operations implemented
 - [ ] #2 Unit tests cover every operation
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Vector2 with immutable ops (add/subtract/multiplyScalar/length/normalize/dot/zero) + 9 unit tests.
+<!-- SECTION:FINAL_SUMMARY:END -->

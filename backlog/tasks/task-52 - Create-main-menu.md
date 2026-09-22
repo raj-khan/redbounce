@@ -1,9 +1,10 @@
 ---
 id: TASK-52
 title: Create main menu
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-09-22 12:31'
+updated_date: '2026-09-22 14:26'
 labels:
   - ui
 milestone: m-3
@@ -24,3 +25,9 @@ Semantic-HTML main menu with start, continue, level select, and settings per spe
 <!-- AC:BEGIN -->
 - [ ] #1 Menu is real HTML with keyboard navigation and visible focus
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Semantic HTML main menu with start/continue, level select, settings; canvas title backdrop.
+<!-- SECTION:FINAL_SUMMARY:END -->

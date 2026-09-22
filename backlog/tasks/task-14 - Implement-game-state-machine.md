@@ -1,9 +1,10 @@
 ---
 id: TASK-14
 title: Implement game state machine
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-09-22 12:31'
+updated_date: '2026-09-22 13:44'
 labels:
   - engine
 milestone: m-1
@@ -26,3 +27,9 @@ Explicit GameState enum with booting, loading, main-menu, level-select, playing,
 - [ ] #2 Invalid transitions are rejected
 - [ ] #3 Unit tests cover transition rules
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+GameStateMachine with all 10 spec states, transition map, listener API, invalid transitions rejected; 9 tests.
+<!-- SECTION:FINAL_SUMMARY:END -->

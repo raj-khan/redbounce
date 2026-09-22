@@ -23,6 +23,27 @@ npm run check     # lint + format + typecheck + test + build
 
 Requires Node.js >= 20.
 
+## Deployment
+
+Production deploys automatically to **GitHub Pages** on every push to `main`
+(via [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml)).
+
+> **DNS note:** this repository's GitHub account has the verified domain
+> `meherullah.dev`, so the Pages site is bound to
+> <http://meherullah.dev/redbounce/>. The domain's DNS currently points at
+> other servers; to serve the game from that domain, point it at GitHub
+> Pages (apex `A` records `185.199.108.153`-`185.199.111.153`, or a
+> `CNAME` to `raj-khan.github.io` for subdomains). Until then the
+> deployment artifact is verified in CI (38 e2e tests run against the same
+> production build).
+
+## Verification
+
+- **195 unit tests** (Vitest) - math, physics, collision, levels, save, input, audio
+- **38 e2e tests** (Playwright) - smoke, gameplay input, menu flow, settings,
+  offline PWA, mobile layout, performance budgets, accessibility
+- CI runs lint, format, typecheck, tests, build, and e2e on every PR
+
 ## Documentation
 
 - [Architecture](./docs/architecture.md)

@@ -1,9 +1,10 @@
 ---
 id: TASK-42
 title: Implement localStorage save repository
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-09-22 12:31'
+updated_date: '2026-09-22 14:14'
 labels:
   - data
 milestone: m-2
@@ -26,3 +27,9 @@ SaveRepository abstraction backed by localStorage with validation and graceful c
 - [ ] #2 Save failures never crash gameplay
 - [ ] #3 Reset-save is available behind confirmation
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+LocalStorageSaveRepository with injectable storage: roundtrip, corrupt-JSON recovery, read/write failure tolerance, reset; 7 tests.
+<!-- SECTION:FINAL_SUMMARY:END -->

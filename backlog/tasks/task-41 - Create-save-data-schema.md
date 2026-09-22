@@ -1,9 +1,10 @@
 ---
 id: TASK-41
 title: Create save data schema
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-09-22 12:31'
+updated_date: '2026-09-22 14:14'
 labels:
   - data
 milestone: m-2
@@ -24,3 +25,9 @@ Versioned SaveData with unlocked levels, results, and settings per spec section 
 <!-- AC:BEGIN -->
 - [ ] #1 SaveData is versioned and typed
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Versioned SaveData (v2) with unlockedLevels, completedLevels, settings; 5 tests.
+<!-- SECTION:FINAL_SUMMARY:END -->

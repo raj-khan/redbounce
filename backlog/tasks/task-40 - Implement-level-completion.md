@@ -1,9 +1,10 @@
 ---
 id: TASK-40
 title: Implement level completion
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-09-22 12:31'
+updated_date: '2026-09-22 14:14'
 labels:
   - gameplay
 milestone: m-2
@@ -27,3 +28,9 @@ Completion sequence with control freeze, results (LevelResult), save, next-level
 - [ ] #2 Completing a level unlocks the next one
 - [ ] #3 Completion persists across reloads
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Completion sequence: control freeze, LevelResult, save + next-level unlock via registry, in-canvas results panel (score/rings/deaths/time), Enter advances levels.
+<!-- SECTION:FINAL_SUMMARY:END -->

@@ -6,6 +6,9 @@ import { PlayScene } from "./PlayScene";
 import { level01 } from "../levels/Level";
 import { LevelRegistry } from "../levels/LevelRegistry";
 import { LevelLoader } from "../levels/LevelLoader";
+import { LocalStorageSaveRepository } from "../save/LocalStorageSaveRepository";
+import type { SaveRepository } from "../save/SaveRepository";
+import type { SaveData } from "../save/SaveData";
 import { createDebugConfig, isDevBuild } from "../debug/DebugConfig";
 import type { PlayerInput } from "../entities/Player";
 import { PHYSICS_CONFIG } from "../config/physics.config";
@@ -22,11 +25,18 @@ export class GameApplication {
   private readonly debugConfig = createDebugConfig();
   private readonly keys = new Set<string>();
   private readonly uiRoot: HTMLElement;
+  private readonly registry = new LevelRegistry();
+  private readonly loader: LevelLoader;
+  private readonly saves: SaveRepository;
+  private save: SaveData | null = null;
   private disposed = false;
 
   constructor(canvas: HTMLCanvasElement, uiRoot: HTMLElement) {
     this.renderer = new CanvasRenderer(canvas);
     this.uiRoot = uiRoot;
+    this.registry.register(level01);
+    this.loader = new LevelLoader(this.registry);
+    this.saves = LocalStorageSaveRepository.create(level01.id);
 
     window.addEventListener("resize", this.onResize);
     window.addEventListener("keydown", this.onKeyDown);
@@ -46,19 +56,46 @@ export class GameApplication {
   start(): void {
     this.uiRoot.dataset.booted = "true";
     this.states.transition("loading");
-    const registry = new LevelRegistry();
-    registry.register(level01);
-    const loader = new LevelLoader(registry);
-    void loader.load(level01.id).then((level) => {
-      const play = new PlayScene(level, this.renderer, this.debugConfig, () =>
-        this.inputSnapshot(),
-      );
-      this.scenes.register("play", () => play);
-      return this.scenes.switchTo("play").then(() => {
-        this.states.transition("playing");
-        this.loop.start();
-      });
+    void this.saves.load().then((save) => {
+      this.save = save;
+      return this.startLevel(this.registry.first()?.id ?? level01.id);
     });
+  }
+
+  private async startLevel(levelId: string): Promise<void> {
+    const level = await this.loader.load(levelId);
+    const play = new PlayScene(level, this.renderer, this.debugConfig, () => this.inputSnapshot());
+    play.world.events.on("level-completed", ({ levelId: id }) => void this.handleCompletion(id));
+    // Re-register so the factory always returns the newest scene.
+    this.scenes.register("play", () => play);
+    await this.scenes.switchTo("play");
+    this.states.transition("playing");
+    if (!this.loop.isRunning()) this.loop.start();
+  }
+
+  private async handleCompletion(levelId: string): Promise<void> {
+    const scene = this.scenes.current();
+    if (!(scene instanceof PlayScene) || !scene.world.result) return;
+    if (!this.save) return;
+    this.save.completedLevels[levelId] = scene.world.result;
+    const next = this.registry.next(levelId);
+    if (next && !this.save.unlockedLevels.includes(next.id)) {
+      this.save.unlockedLevels.push(next.id);
+    }
+    this.save.updatedAt = Date.now();
+    await this.saves.save(this.save);
+  }
+
+  /** Enter after completion: advance to the next unlocked level. */
+  private async advanceLevel(): Promise<void> {
+    const scene = this.scenes.current();
+    if (!(scene instanceof PlayScene) || !scene.world.completed) return;
+    const currentId = scene.world.level.id;
+    const next = this.registry.next(currentId);
+    const target = next ? next.id : this.registry.first()?.id;
+    if (!target) return;
+    if (this.states.current() === "playing") this.states.transition("level-complete");
+    await this.startLevel(target);
   }
 
   stop(): void {
@@ -85,6 +122,9 @@ export class GameApplication {
     this.keys.add(event.code);
     if (event.code === "KeyR" && this.states.current() === "playing") {
       this.restartLevel();
+    }
+    if (event.code === "Enter" || event.code === "NumpadEnter") {
+      void this.advanceLevel();
     }
     if (event.code === "F3" && isDevBuild()) {
       this.debugConfig.enabled = !this.debugConfig.enabled;

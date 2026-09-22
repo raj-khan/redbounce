@@ -1,6 +1,13 @@
 import type { Player } from "../entities/Player";
-import type { PlatformRuntime } from "../levels/Level";
+import type { Rect } from "../math/Rect";
 import { circleRectContact } from "../physics/CollisionResolver";
+
+/** Minimal solid surface shape accepted by the collision system. */
+export type SolidSurface = {
+  id: string;
+  rect: Rect;
+  oneWay: boolean;
+};
 
 /**
  * Resolves the player circle against solid platforms (spec section 12).
@@ -13,7 +20,7 @@ export class CollisionSystem {
    * Resolve horizontal overlap after the x integration step.
    * Returns true when any solid was hit.
    */
-  resolveHorizontal(player: Player, platforms: readonly PlatformRuntime[]): boolean {
+  resolveHorizontal(player: Player, platforms: readonly SolidSurface[]): boolean {
     let hit = false;
     for (const platform of platforms) {
       if (platform.oneWay) continue;
@@ -35,7 +42,7 @@ export class CollisionSystem {
    */
   resolveVertical(
     player: Player,
-    platforms: readonly PlatformRuntime[],
+    platforms: readonly SolidSurface[],
     previousBottom: number,
   ): string | null {
     let landedOn: string | null = null;

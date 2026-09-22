@@ -42,8 +42,12 @@ export class Player {
     this.config = config;
   }
 
-  /** Integrate one fixed step: horizontal control + gravity (spec section 12). */
-  update(deltaSeconds: number, input: PlayerInput): void {
+  /**
+   * Integrate one fixed step: horizontal control + gravity (spec section 12).
+   * `externalAccelX` models continuous zone forces (wind) that must not be
+   * cancelled by input deceleration.
+   */
+  update(deltaSeconds: number, input: PlayerInput, externalAccelX = 0): void {
     if (this.state === "dead" || this.state === "finished") {
       // Dead/finished players still fall for the death animation.
       this.integrateGravity(deltaSeconds);
@@ -52,15 +56,20 @@ export class Player {
     }
 
     const dir = input.left && !input.right ? -1 : input.right && !input.left ? 1 : 0;
+    const windActive = externalAccelX !== 0;
     if (dir !== 0) {
       this.facing = dir as 1 | -1;
       const accel =
         this.config.horizontalAcceleration * (this.grounded ? 1 : this.config.airControl);
       this.vx = approach(this.vx, dir * this.config.maxHorizontalSpeed, accel * deltaSeconds);
-    } else {
+    } else if (!windActive) {
+      // With active wind the zone force replaces passive deceleration.
       const decel =
         this.config.horizontalDeceleration * (this.grounded ? 1 : this.config.airControl);
       this.vx = approach(this.vx, 0, decel * deltaSeconds);
+    }
+    if (windActive) {
+      this.vx = clamp(this.vx + externalAccelX * deltaSeconds, -150, 150);
     }
 
     this.integrateGravity(deltaSeconds);
@@ -89,7 +98,7 @@ export class Player {
   }
 
   /** Landing on a surface: automatic bounce (spec sections 11-12). */
-  bounce(velocity = this.config.bounceVelocity): void {
+  bounce(velocity: number = this.config.bounceVelocity): void {
     this.vy = velocity;
     this.grounded = true;
     this.squashAnim = 1;

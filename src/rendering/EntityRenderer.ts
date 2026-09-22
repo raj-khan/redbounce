@@ -354,6 +354,157 @@ export class EntityRenderer {
     ctx.textBaseline = "middle";
     ctx.fillText("EXIT", exit.rect.x + exit.rect.width / 2, exit.rect.y + exit.rect.height / 2);
   }
+  /** Enemies with telegraphed behavior (spec section 15). */
+  drawEnemy(
+    r: RenderContext,
+    enemy: import("../entities/EntityRuntime").EnemyRuntime,
+    time: number,
+  ): void {
+    const { ctx } = r;
+    ctx.save();
+    switch (enemy.kind) {
+      case "patroller": {
+        // Slime that squishes along its path.
+        const squish = 1 + Math.sin(time * 8) * 0.12;
+        ctx.translate(enemy.x, enemy.y);
+        ctx.scale(squish, 2 - squish);
+        ctx.fillStyle = "#7b4ca8";
+        ctx.beginPath();
+        ctx.arc(0, 0, enemy.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.arc(-2, -1, 1.6, 0, Math.PI * 2);
+        ctx.arc(2, -1, 1.6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#1a1c2c";
+        ctx.beginPath();
+        ctx.arc(-2 + enemy.direction, -1, 0.8, 0, Math.PI * 2);
+        ctx.arc(2 + enemy.direction, -1, 0.8, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+      }
+      case "chaser": {
+        // Angry blob: red when aggro (clear telegraph).
+        ctx.translate(enemy.x, enemy.y);
+        ctx.fillStyle = enemy.aggro ? "#d64550" : "#8a6f9b";
+        ctx.beginPath();
+        ctx.arc(0, 0, enemy.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = enemy.aggro ? "#ffd23f" : "rgba(255,255,255,0.3)";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        if (enemy.aggro) {
+          ctx.fillStyle = "#fff";
+          ctx.beginPath();
+          ctx.moveTo(-3, -3);
+          ctx.lineTo(-1, -1.5);
+          ctx.moveTo(3, -3);
+          ctx.lineTo(1, -1.5);
+          ctx.stroke();
+        }
+        break;
+      }
+      case "orbital": {
+        // Spiked orb on an orbit path.
+        ctx.strokeStyle = "rgba(244,244,244,0.15)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(enemy.centerX, enemy.centerY, enemy.orbitRadius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.translate(enemy.x, enemy.y);
+        ctx.rotate(enemy.angle * 2);
+        ctx.fillStyle = "#aab0bd";
+        const spikes = 6;
+        ctx.beginPath();
+        for (let i = 0; i < spikes * 2; i++) {
+          const radius = i % 2 === 0 ? enemy.radius : enemy.radius * 0.55;
+          const angle = (Math.PI / spikes) * i;
+          const x = Math.cos(angle) * radius;
+          const y = Math.sin(angle) * radius;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.fill();
+        break;
+      }
+    }
+    ctx.restore();
+  }
+
+  /** Wind zone: drifting streaks showing force direction (spec world 4). */
+  drawWindZone(
+    r: RenderContext,
+    zone: { rect: { x: number; y: number; width: number; height: number }; forceX: number },
+    time: number,
+  ): void {
+    const { ctx } = r;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(zone.rect.x, zone.rect.y, zone.rect.width, zone.rect.height);
+    ctx.clip();
+    ctx.strokeStyle = "rgba(255,255,255,0.18)";
+    ctx.lineWidth = 1;
+    const direction = Math.sign(zone.forceX);
+    const speed = Math.abs(zone.forceX) * 0.4;
+    for (let i = 0; i < 8; i++) {
+      const y = zone.rect.y + ((i * 53 + time * 10) % zone.rect.height);
+      const offset = ((time * speed + i * 71) % (zone.rect.width + 40)) - 20;
+      const x = direction > 0 ? zone.rect.x + offset : zone.rect.x + zone.rect.width - offset;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + direction * 12, y);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  /** Bounce pad with activation flash. */
+  drawBouncePad(
+    r: RenderContext,
+    pad: { rect: { x: number; y: number; width: number; height: number }; flash: number },
+  ): void {
+    const { ctx } = r;
+    this.drawPlatform(r, {
+      x: pad.rect.x,
+      y: pad.rect.y,
+      width: pad.rect.width,
+      height: pad.rect.height,
+      kind: "bounce-pad",
+    });
+    if (pad.flash > 0) {
+      ctx.fillStyle = `rgba(91,192,235,${pad.flash * 0.8})`;
+      ctx.fillRect(pad.rect.x - 2, pad.rect.y - 6 * pad.flash, pad.rect.width + 4, 6 * pad.flash);
+    }
+  }
+
+  /** Particles as simple fading circles (spec sections 20 and 29). */
+  drawParticles(
+    r: RenderContext,
+    particles: readonly {
+      x: number;
+      y: number;
+      size: number;
+      color: string;
+      life: number;
+      maxLife: number;
+    }[],
+  ): void {
+    const { ctx } = r;
+    for (const particle of particles) {
+      const alpha = Math.max(0, particle.life / particle.maxLife);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = particle.color;
+      ctx.fillRect(
+        particle.x - particle.size / 2,
+        particle.y - particle.size / 2,
+        particle.size,
+        particle.size,
+      );
+    }
+    ctx.globalAlpha = 1;
+  }
 }
 
 function platformColors(material: PlatformView["material"]): { body: string; edge: string } {

@@ -1,4 +1,4 @@
-import type { EntityDefinition, LevelDefinition } from "../levels/Level";
+import type { EntityDefinition, LevelDefinition, PlatformMaterial, Vec2Def } from "../levels/Level";
 
 /** Runtime entity state, separate from frozen level data (spec section 38). */
 
@@ -55,6 +55,83 @@ export type ExitRuntime = {
   id: string;
   rect: { x: number; y: number; width: number; height: number };
   requiresKey: boolean;
+};
+
+export type MovingPlatformRuntime = {
+  id: string;
+  start: Vec2Def;
+  end: Vec2Def;
+  durationSeconds: number;
+  easing: "linear" | "smooth";
+  time: number;
+  /** Current rect, recomputed each tick before collision resolution. */
+  rect: { x: number; y: number; width: number; height: number };
+  material: PlatformMaterial;
+  /** Delta applied since the previous tick, for riders. */
+  deltaX: number;
+  deltaY: number;
+};
+
+export type BouncePadRuntime = {
+  id: string;
+  rect: { x: number; y: number; width: number; height: number };
+  velocity: number;
+  /** Activation animation timer. */
+  flash: number;
+};
+
+export type BreakablePlatformRuntime = {
+  id: string;
+  rect: { x: number; y: number; width: number; height: number };
+  breakDelaySeconds: number;
+  contactTime: number;
+  state: "intact" | "cracking" | "broken";
+  flash: number;
+};
+
+export type EnemyRuntime =
+  | {
+      kind: "patroller";
+      id: string;
+      start: Vec2Def;
+      end: Vec2Def;
+      speed: number;
+      radius: number;
+      x: number;
+      y: number;
+      direction: 1 | -1;
+    }
+  | {
+      kind: "chaser";
+      id: string;
+      homeX: number;
+      homeY: number;
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      speed: number;
+      radius: number;
+      aggroRadius: number;
+      aggro: boolean;
+    }
+  | {
+      kind: "orbital";
+      id: string;
+      centerX: number;
+      centerY: number;
+      orbitRadius: number;
+      radius: number;
+      angularSpeed: number;
+      angle: number;
+      x: number;
+      y: number;
+    };
+
+export type WindZoneRuntime = {
+  id: string;
+  rect: { x: number; y: number; width: number; height: number };
+  forceX: number;
 };
 
 /** Build runtime collectibles from level data. */
@@ -174,4 +251,126 @@ export function toRuntimeExit(level: LevelDefinition): ExitRuntime | null {
     }
   }
   return null;
+}
+
+export function toRuntimeMovingPlatforms(level: LevelDefinition): MovingPlatformRuntime[] {
+  return level.entities
+    .filter(
+      (entity): entity is Extract<EntityDefinition, { type: "moving-platform" }> =>
+        entity.type === "moving-platform",
+    )
+    .map((entity) => ({
+      id: entity.id,
+      start: { ...entity.start },
+      end: { ...entity.end },
+      durationSeconds: Math.max(0.5, entity.durationSeconds),
+      easing: entity.easing ?? "smooth",
+      time: 0,
+      rect: {
+        x: entity.start.x,
+        y: entity.start.y,
+        width: entity.width,
+        height: entity.height,
+      },
+      material: entity.material ?? "metal",
+      deltaX: 0,
+      deltaY: 0,
+    }));
+}
+
+export function toRuntimeBouncePads(level: LevelDefinition): BouncePadRuntime[] {
+  return level.entities
+    .filter(
+      (entity): entity is Extract<EntityDefinition, { type: "bounce-pad" }> =>
+        entity.type === "bounce-pad",
+    )
+    .map((entity) => ({
+      id: entity.id,
+      rect: { x: entity.x, y: entity.y, width: entity.width, height: entity.height },
+      velocity: entity.velocity ?? -330,
+      flash: 0,
+    }));
+}
+
+export function toRuntimeBreakables(level: LevelDefinition): BreakablePlatformRuntime[] {
+  return level.entities
+    .filter(
+      (entity): entity is Extract<EntityDefinition, { type: "breakable-platform" }> =>
+        entity.type === "breakable-platform",
+    )
+    .map((entity) => ({
+      id: entity.id,
+      rect: { x: entity.x, y: entity.y, width: entity.width, height: entity.height },
+      breakDelaySeconds: entity.breakDelaySeconds ?? 0.6,
+      contactTime: 0,
+      state: "intact" as const,
+      flash: 0,
+    }));
+}
+
+export function toRuntimeEnemies(level: LevelDefinition): EnemyRuntime[] {
+  const enemies: EnemyRuntime[] = [];
+  for (const entity of level.entities) {
+    switch (entity.type) {
+      case "patroller":
+        enemies.push({
+          kind: "patroller",
+          id: entity.id,
+          start: { ...entity.start },
+          end: { ...entity.end },
+          speed: entity.speed ?? 40,
+          radius: entity.radius ?? 6,
+          x: entity.start.x,
+          y: entity.start.y,
+          direction: 1,
+        });
+        break;
+      case "chaser":
+        enemies.push({
+          kind: "chaser",
+          id: entity.id,
+          homeX: entity.x,
+          homeY: entity.y,
+          x: entity.x,
+          y: entity.y,
+          vx: 0,
+          vy: 0,
+          speed: entity.speed ?? 55,
+          radius: entity.radius ?? 6,
+          aggroRadius: entity.aggroRadius ?? 80,
+          aggro: false,
+        });
+        break;
+      case "orbital":
+        enemies.push({
+          kind: "orbital",
+          id: entity.id,
+          centerX: entity.center.x,
+          centerY: entity.center.y,
+          orbitRadius: entity.orbitRadius,
+          radius: entity.radius ?? 6,
+          angularSpeed: entity.angularSpeed ?? 2,
+          angle: 0,
+          x: entity.center.x + entity.orbitRadius,
+          y: entity.center.y,
+        });
+        break;
+      default:
+        break;
+    }
+  }
+  return enemies;
+}
+
+export function toRuntimeWindZones(level: LevelDefinition): WindZoneRuntime[] {
+  return level.entities
+    .filter(
+      (entity): entity is Extract<EntityDefinition, { type: "wind-zone" }> =>
+        entity.type === "wind-zone",
+    )
+    .map((entity) => ({
+      id: entity.id,
+      rect: { x: entity.x, y: entity.y, width: entity.width, height: entity.height },
+      forceX: entity.forceX ?? 120,
+    }));
 }

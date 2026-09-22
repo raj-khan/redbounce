@@ -4,6 +4,7 @@ import type { CanvasRenderer } from "../rendering/CanvasRenderer";
 import { BackgroundRenderer } from "../rendering/BackgroundRenderer";
 import { EntityRenderer } from "../rendering/EntityRenderer";
 import { DebugRenderer } from "../rendering/DebugRenderer";
+import { PALETTE } from "../config/rendering.config";
 import type { PlayerInput } from "../entities/Player";
 import { GameWorld } from "../systems/GameWorld";
 import type { LevelDefinition } from "../levels/Level";
@@ -70,6 +71,7 @@ export class PlayScene implements GameScene {
     this.renderer.beginFrame();
 
     // World layers.
+    const time = this.world.elapsedSeconds;
     this.background.render(r, this.world.level.world);
     r.applyCameraTransform();
     for (const platform of this.world.platforms) {
@@ -81,6 +83,18 @@ export class PlayScene implements GameScene {
         material: platform.material,
         kind: platform.oneWay ? "one-way" : "static",
       });
+    }
+    for (const hazard of this.world.hazards) {
+      this.entities.drawHazard(r, hazard);
+    }
+    for (const checkpoint of this.world.checkpoints) {
+      this.entities.drawCheckpoint(r, checkpoint);
+    }
+    if (this.world.exit) {
+      this.entities.drawExit(r, this.world.exit, time);
+    }
+    for (const collectible of this.world.collectibles) {
+      this.entities.drawCollectible(r, collectible, time);
     }
     const p = this.world.player;
     this.entities.drawPlayer(r, {
@@ -96,10 +110,37 @@ export class PlayScene implements GameScene {
       phase: p.bounceCount,
     });
 
-    // Screen-space HUD (basic Phase 1 HUD).
+    // Screen-space HUD.
     r.applyScreenTransform();
     r.fillTextScreen(this.world.level.name.toUpperCase(), 4, 4, "#f4f4f4", 8);
-    r.fillTextScreen("R RESTART", r.logicalWidth - 56, 4, "rgba(244,244,244,0.6)", 6);
+    r.fillTextScreen(
+      `RINGS ${this.world.collectiblesFound}/${this.world.collectiblesTotal}`,
+      4,
+      14,
+      PALETTE.ring,
+      8,
+    );
+    r.fillTextScreen(`SCORE ${this.world.score}`, r.logicalWidth - 70, 4, "#f4f4f4", 8);
+    r.fillTextScreen(
+      `LIVES ${Math.max(0, this.world.lives)}`,
+      r.logicalWidth - 70,
+      14,
+      PALETTE.heart,
+      8,
+    );
+    if (this.world.hasKey) {
+      r.fillTextScreen("KEY", 4, 24, PALETTE.key, 8);
+    }
+    if (this.world.completed) {
+      r.applyScreenTransform();
+      r.fillTextScreen(
+        "LEVEL COMPLETE",
+        r.logicalWidth / 2 - 46,
+        r.logicalHeight / 2,
+        "#4fd66d",
+        10,
+      );
+    }
 
     // Debug overlay (development only).
     this.debug.enabled = this.debugConfig.enabled;

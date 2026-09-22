@@ -1,9 +1,10 @@
 ---
 id: TASK-36
 title: Implement player death
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-09-22 12:31'
+updated_date: '2026-09-22 14:11'
 labels:
   - gameplay
 milestone: m-2
@@ -25,3 +26,9 @@ Death state, input disable, death animation, PlayerDied event, and death screen 
 - [ ] #1 Death freezes player control and emits PlayerDied
 - [ ] #2 Death counter updates
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Death state disables input, 0.6s animation, PlayerDied event, deaths counter, death face render.
+<!-- SECTION:FINAL_SUMMARY:END -->

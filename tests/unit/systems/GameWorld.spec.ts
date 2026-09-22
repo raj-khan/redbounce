@@ -109,10 +109,19 @@ describe("GameWorld integration", () => {
 
   it("respawn grants a short invulnerability window", () => {
     const world = new GameWorld(makeLevel({ entities: [] }));
-    const world2 = new GameWorld(makeLevel({ entities: [] }));
-    world2.killPlayer("pit");
-    expect(world2.player.invulnerability).toBeGreaterThan(0);
-    expect(world.player.invulnerability).toBe(0);
+    world.killPlayer("pit");
+    expect(world.player.state).toBe("dead");
+    // Death animation delay elapses, then respawn with invulnerability.
+    for (let i = 0; i < 60; i++) world.step(DT, NO_INPUT);
+    expect(world.player.state).not.toBe("dead");
+    expect(world.player.invulnerability).toBeGreaterThan(0);
+  });
+
+  it("death disables input during the animation", () => {
+    const world = new GameWorld(makeLevel({ entities: [] }));
+    world.killPlayer("pit");
+    for (let i = 0; i < 20; i++) world.step(DT, { left: false, right: true });
+    expect(world.player.vx).toBe(0);
   });
 
   it("one-way platform can be passed from below", () => {

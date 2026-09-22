@@ -1,9 +1,10 @@
 ---
 id: TASK-38
 title: Implement checkpoints
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-09-22 12:31'
+updated_date: '2026-09-22 14:11'
 labels:
   - gameplay
 milestone: m-2
@@ -25,3 +26,9 @@ Sensor checkpoints that become the respawn point when touched, with activation f
 - [ ] #1 Latest touched checkpoint becomes respawn point
 - [ ] #2 Checkpoint state resets on level restart
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Checkpoint sensors activate on touch, set validated respawn above ground, reset on restart; 3 tests.
+<!-- SECTION:FINAL_SUMMARY:END -->

@@ -1,9 +1,10 @@
 ---
 id: TASK-19
 title: Add logical viewport scaling
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-09-22 12:31'
+updated_date: '2026-09-22 13:48'
 labels:
   - rendering
 milestone: m-1
@@ -25,3 +26,9 @@ ordinal: 19000
 - [ ] #1 Game preserves aspect ratio across window sizes
 - [ ] #2 World is never stretched independently on X and Y
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+computeCanvasSize preserves 16:9 with letterboxing; fractional CSS px keeps aspect exact; backing capped at dpr 3.
+<!-- SECTION:FINAL_SUMMARY:END -->

@@ -1,9 +1,10 @@
 ---
 id: TASK-22
 title: Render platforms
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-09-22 12:31'
+updated_date: '2026-09-22 13:48'
 labels:
   - rendering
 milestone: m-1
@@ -24,3 +25,9 @@ Draw static platforms with material styling per spec section 13.
 <!-- AC:BEGIN -->
 - [ ] #1 Platforms render at world positions transformed by the camera
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+drawPlatform with grass/stone/ice/metal/wood materials and per-kind accents.
+<!-- SECTION:FINAL_SUMMARY:END -->

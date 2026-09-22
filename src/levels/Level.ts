@@ -100,6 +100,7 @@ export type HeartDef = {
   type: "heart";
   x: number;
   y: number;
+  value?: number;
 };
 
 export type SpikesDef = {

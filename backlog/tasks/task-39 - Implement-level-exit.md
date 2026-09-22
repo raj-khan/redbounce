@@ -1,9 +1,10 @@
 ---
 id: TASK-39
 title: Implement level exit
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-09-22 12:31'
+updated_date: '2026-09-22 14:11'
 labels:
   - gameplay
 milestone: m-2
@@ -24,3 +25,9 @@ Exit sensor zone with completion conditions (alive, key, objectives) per spec se
 <!-- AC:BEGIN -->
 - [ ] #1 Exit only completes the level when conditions are met
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Exit sensor with key and requiredCollectibles gates; LevelResult computation; 6 completion tests.
+<!-- SECTION:FINAL_SUMMARY:END -->

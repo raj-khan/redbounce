@@ -1,9 +1,10 @@
 ---
 id: TASK-37
 title: Implement respawn
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-09-22 12:31'
+updated_date: '2026-09-22 14:11'
 labels:
   - gameplay
 milestone: m-2
@@ -26,3 +27,9 @@ Respawn at active checkpoint with validated spawn point, hazard resets, and shor
 - [ ] #2 Respawn grants brief invulnerability
 - [ ] #3 Restart resets transient state correctly
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Respawn at checkpoint spawn with invulnerability window; out-of-lives triggers full restart; tested.
+<!-- SECTION:FINAL_SUMMARY:END -->

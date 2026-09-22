@@ -1,9 +1,10 @@
 ---
 id: TASK-34
 title: Implement collectibles
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-09-22 12:31'
+updated_date: '2026-09-22 14:11'
 labels:
   - gameplay
 milestone: m-2
@@ -27,3 +28,9 @@ Ring, star, crystal, key, and heart types with sensor overlap, score, particles,
 - [ ] #2 Collectibles respawn on level restart when configured
 - [ ] #3 Collection uses sensors and never blocks movement
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Rings/stars/keys/hearts with sensor pickup, score/lives/key state, events, restart respawn; 5 tests.
+<!-- SECTION:FINAL_SUMMARY:END -->

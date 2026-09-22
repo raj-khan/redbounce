@@ -4,6 +4,8 @@ import { SceneManager } from "../core/SceneManager";
 import { CanvasRenderer } from "../rendering/CanvasRenderer";
 import { PlayScene } from "./PlayScene";
 import { level01 } from "../levels/Level";
+import { LevelRegistry } from "../levels/LevelRegistry";
+import { LevelLoader } from "../levels/LevelLoader";
 import { createDebugConfig, isDevBuild } from "../debug/DebugConfig";
 import type { PlayerInput } from "../entities/Player";
 import { PHYSICS_CONFIG } from "../config/physics.config";
@@ -44,13 +46,18 @@ export class GameApplication {
   start(): void {
     this.uiRoot.dataset.booted = "true";
     this.states.transition("loading");
-    const play = new PlayScene(level01, this.renderer, this.debugConfig, () =>
-      this.inputSnapshot(),
-    );
-    this.scenes.register("play", () => play);
-    void this.scenes.switchTo("play").then(() => {
-      this.states.transition("playing");
-      this.loop.start();
+    const registry = new LevelRegistry();
+    registry.register(level01);
+    const loader = new LevelLoader(registry);
+    void loader.load(level01.id).then((level) => {
+      const play = new PlayScene(level, this.renderer, this.debugConfig, () =>
+        this.inputSnapshot(),
+      );
+      this.scenes.register("play", () => play);
+      return this.scenes.switchTo("play").then(() => {
+        this.states.transition("playing");
+        this.loop.start();
+      });
     });
   }
 

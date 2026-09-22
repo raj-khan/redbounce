@@ -5,6 +5,7 @@
  * runtime lifecycle in docs/architecture.md (section 6).
  */
 import { GameApplication } from "./app/GameApplication";
+import { registerServiceWorker } from "./pwa/registerServiceWorker";
 
 function boot(): void {
   const canvas = document.getElementById("game-canvas");
@@ -20,6 +21,7 @@ function boot(): void {
 
   const app = new GameApplication(canvas, uiRoot);
   app.start();
+  registerServiceWorker();
 }
 
 if (document.readyState === "loading") {

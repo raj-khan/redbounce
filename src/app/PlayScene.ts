@@ -1,0 +1,129 @@
+import type { GameScene } from "../core/Scene";
+import type { Camera } from "../rendering/Camera";
+import type { CanvasRenderer } from "../rendering/CanvasRenderer";
+import { BackgroundRenderer } from "../rendering/BackgroundRenderer";
+import { EntityRenderer } from "../rendering/EntityRenderer";
+import { DebugRenderer } from "../rendering/DebugRenderer";
+import type { PlayerInput } from "../entities/Player";
+import { GameWorld } from "../systems/GameWorld";
+import type { LevelDefinition } from "../levels/Level";
+import type { DebugConfig } from "../debug/DebugConfig";
+
+/**
+ * The gameplay scene: owns the world simulation and renders it.
+ * Rendering reads world state; it never mutates it (spec section 20).
+ */
+export class PlayScene implements GameScene {
+  readonly world: GameWorld;
+  private readonly renderer: CanvasRenderer;
+  private readonly camera: Camera;
+  private readonly background = new BackgroundRenderer();
+  private readonly entities = new EntityRenderer();
+  private readonly debug: DebugRenderer;
+  private readonly getInput: () => PlayerInput;
+  private readonly debugConfig: DebugConfig;
+  private frames = 0;
+  private fpsEstimate = 60;
+
+  constructor(
+    level: LevelDefinition,
+    renderer: CanvasRenderer,
+    debugConfig: DebugConfig,
+    getInput: () => PlayerInput,
+  ) {
+    this.world = new GameWorld(level);
+    this.renderer = renderer;
+    this.camera = renderer.camera;
+    this.debugConfig = debugConfig;
+    this.debug = new DebugRenderer();
+    this.getInput = getInput;
+  }
+
+  enter(): void {
+    this.camera.setBounds({
+      minX: this.world.level.camera.minX,
+      maxX: this.world.level.camera.maxX,
+      minY: this.world.level.camera.minY,
+      maxY: this.world.level.camera.maxY,
+    });
+    this.camera.snapTo(this.world.player.x, this.world.player.y);
+    this.world.start();
+  }
+
+  update(deltaSeconds: number): void {
+    this.world.step(deltaSeconds, this.getInput());
+    this.camera.update(deltaSeconds);
+    this.camera.follow(
+      this.world.player.x,
+      this.world.player.y,
+      this.world.player.vx,
+      deltaSeconds,
+    );
+    this.frames++;
+    if (this.frames % 30 === 0) {
+      this.fpsEstimate = 1 / deltaSeconds;
+    }
+  }
+
+  render(_alpha: number): void {
+    const r = this.renderer.context;
+    this.renderer.beginFrame();
+
+    // World layers.
+    this.background.render(r, this.world.level.world);
+    r.applyCameraTransform();
+    for (const platform of this.world.platforms) {
+      this.entities.drawPlatform(r, {
+        x: platform.rect.x,
+        y: platform.rect.y,
+        width: platform.rect.width,
+        height: platform.rect.height,
+        material: platform.material,
+        kind: platform.oneWay ? "one-way" : "static",
+      });
+    }
+    const p = this.world.player;
+    this.entities.drawPlayer(r, {
+      x: p.x,
+      y: p.y,
+      radius: p.radius,
+      velocityX: p.vx,
+      velocityY: p.vy,
+      squash: p.squashFactor(),
+      facing: p.facing,
+      invulnerable: p.invulnerability > 0,
+      dead: p.state === "dead",
+      phase: p.bounceCount,
+    });
+
+    // Screen-space HUD (basic Phase 1 HUD).
+    r.applyScreenTransform();
+    r.fillTextScreen(this.world.level.name.toUpperCase(), 4, 4, "#f4f4f4", 8);
+    r.fillTextScreen("R RESTART", r.logicalWidth - 56, 4, "rgba(244,244,244,0.6)", 6);
+
+    // Debug overlay (development only).
+    this.debug.enabled = this.debugConfig.enabled;
+    this.debug.renderShapes(
+      r,
+      this.world.platforms.map((platform) => ({ kind: "rect" as const, ...platform.rect })),
+    );
+    if (this.world.platforms.length > 0) {
+      this.debug.renderShapes(r, [{ kind: "circle", x: p.x, y: p.y, radius: p.radius }]);
+    }
+    this.debug.renderInfo(r, {
+      fps: this.fpsEstimate,
+      tick: this.world.tick,
+      state: this.world.player.state,
+      levelId: this.world.level.id,
+      entityId: this.world.platforms.length + 1,
+      playerX: p.x,
+      playerY: p.y,
+      velocityX: p.vx,
+      velocityY: p.vy,
+    });
+  }
+
+  exit(): void {
+    // Nothing to dispose yet; scene recreation resets all transient state.
+  }
+}

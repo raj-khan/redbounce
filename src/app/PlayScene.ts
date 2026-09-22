@@ -131,15 +131,34 @@ export class PlayScene implements GameScene {
     if (this.world.hasKey) {
       r.fillTextScreen("KEY", 4, 24, PALETTE.key, 8);
     }
-    if (this.world.completed) {
-      r.applyScreenTransform();
+    if (this.world.completed && this.world.result) {
+      const result = this.world.result;
+      const { ctx } = r;
+      ctx.fillStyle = "rgba(10,12,24,0.82)";
+      const bx = r.logicalWidth / 2 - 70;
+      const by = r.logicalHeight / 2 - 40;
+      ctx.fillRect(bx, by, 140, 80);
+      ctx.strokeStyle = "#4fd66d";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(bx, by, 140, 80);
+      r.fillTextScreen("LEVEL COMPLETE", bx + 26, by + 8, "#4fd66d", 10);
+      r.fillTextScreen(`SCORE ${result.score}`, bx + 12, by + 26, "#f4f4f4", 8);
       r.fillTextScreen(
-        "LEVEL COMPLETE",
-        r.logicalWidth / 2 - 46,
-        r.logicalHeight / 2,
-        "#4fd66d",
-        10,
+        `RINGS ${result.collectiblesFound}/${result.collectiblesTotal}`,
+        bx + 12,
+        by + 37,
+        PALETTE.ring,
+        8,
       );
+      r.fillTextScreen(`DEATHS ${result.deaths}`, bx + 12, by + 48, "#f4f4f4", 8);
+      r.fillTextScreen(
+        `TIME ${result.completionTimeSeconds.toFixed(1)}s`,
+        bx + 12,
+        by + 59,
+        "#f4f4f4",
+        8,
+      );
+      r.fillTextScreen("ENTER: NEXT LEVEL", bx + 22, by + 70, "rgba(244,244,244,0.7)", 6);
     }
 
     // Debug overlay (development only).

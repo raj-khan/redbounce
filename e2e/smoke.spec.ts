@@ -35,4 +35,26 @@ test.describe("smoke", () => {
     await page.waitForTimeout(200);
     await expect(page.locator("#game-canvas")).toBeVisible();
   });
+
+  test("main menu flow: start, pause menu, resume", async ({ page }) => {
+    await page.goto("/");
+    const start = page.getByRole("menuitem", { name: "START" });
+    await expect(start).toBeVisible();
+    await start.click();
+    await page.waitForTimeout(300);
+
+    // Pause menu appears with accessible buttons.
+    await page.keyboard.press("KeyP");
+    await expect(page.getByRole("menuitem", { name: "RESUME" })).toBeVisible();
+    await page.getByRole("menuitem", { name: "RESUME" }).click();
+    await page.waitForTimeout(200);
+    await expect(page.getByRole("menuitem", { name: "RESUME" })).toBeHidden();
+  });
+
+  test("settings screen opens from main menu", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("menuitem", { name: "SETTINGS" }).click();
+    await expect(page.getByLabel("Master volume")).toBeVisible();
+    await expect(page.getByRole("menuitem", { name: "BACK" })).toBeVisible();
+  });
 });

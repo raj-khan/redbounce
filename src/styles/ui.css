@@ -1,48 +1,181 @@
-/* HTML overlay UI (menus, touch controls) rendered above the canvas */
-.ui-root {
+/* HTML overlay screens (spec sections 26 and 30) */
+
+.screen {
+  background: rgba(12, 14, 24, 0.9);
+  border: 1px solid rgba(244, 244, 244, 0.15);
+  border-radius: 12px;
+  padding: 28px 32px;
+  min-width: 260px;
+  max-width: min(420px, 90vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+.title {
+  font-size: 34px;
+  letter-spacing: 4px;
+  margin: 0 0 4px;
+  color: #ef7d57;
+  text-shadow: 0 3px 0 #b13e53;
+}
+
+.title.small {
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.subtitle {
+  margin: 0 0 20px;
+  color: rgba(244, 244, 244, 0.7);
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.menu-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.menu-btn {
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 2px;
+  padding: 10px 18px;
+  color: #f4f4f4;
+  background: rgba(239, 125, 87, 0.15);
+  border: 2px solid rgba(239, 125, 87, 0.6);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.menu-btn:hover:not([disabled]) {
+  background: rgba(239, 125, 87, 0.35);
+}
+
+.menu-btn:focus-visible {
+  outline: 3px solid #ffd23f;
+  outline-offset: 2px;
+}
+
+.menu-btn[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.menu-btn.danger {
+  border-color: rgba(177, 62, 83, 0.8);
+  color: #ffb3c0;
+}
+
+.lvl .lvl-num {
+  color: rgba(244, 244, 244, 0.5);
+  font-size: 11px;
+}
+
+.lvl-state.locked {
+  font-size: 12px;
+}
+
+.lvl-state.done {
+  color: #38b764;
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.settings label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.settings .check {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings input[type="range"] {
+  width: 100%;
+  accent-color: #ef7d57;
+}
+
+.death-flash {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: rgba(177, 62, 83, 0.35);
+  border: none;
+  box-shadow: none;
+  padding: 0;
   pointer-events: none;
 }
 
-.ui-root > * {
-  pointer-events: auto;
+.death-text {
+  font-size: 26px;
+  letter-spacing: 6px;
+  color: #fff;
+  text-shadow: 0 2px 0 #b13e53;
+  margin: 0;
 }
 
-.touch-controls {
-  position: fixed;
-  inset: auto 0 0 0;
+.results {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  padding: 0 max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-bottom))
-    max(12px, env(safe-area-inset-left));
-  pointer-events: none;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: rgba(244, 244, 244, 0.85);
+  margin-bottom: 16px;
 }
 
-.touch-btn {
-  pointer-events: auto;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  border: 2px solid rgba(244, 244, 244, 0.7);
-  background: rgba(26, 28, 44, 0.55);
-  color: var(--color-fg);
-  font-size: 22px;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: none;
+.results strong {
+  color: #ffd23f;
 }
 
-.touch-btn:active {
-  background: rgba(239, 125, 87, 0.55);
+.objectives {
+  color: #38b764;
+  font-size: 10px;
 }
 
-.touch-pause {
-  width: 48px;
-  height: 48px;
-  font-size: 14px;
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-btn {
+    transition: none;
+  }
 }

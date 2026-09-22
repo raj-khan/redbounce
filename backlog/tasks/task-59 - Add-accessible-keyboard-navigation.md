@@ -1,9 +1,10 @@
 ---
 id: TASK-59
 title: Add accessible keyboard navigation
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-09-22 12:31'
+updated_date: '2026-09-22 14:26'
 labels:
   - a11y
 milestone: m-3
@@ -26,3 +27,9 @@ Keyboard navigation, focus states, aria-live status, and contrast across all men
 - [ ] #2 Important status updates use aria-live
 - [ ] #3 Status is never conveyed by color alone
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Native button focus + visible focus states, arrow-key menu navigation, aria-live status region, sr-only helper, reduced-motion CSS; menu flow e2e tests.
+<!-- SECTION:FINAL_SUMMARY:END -->

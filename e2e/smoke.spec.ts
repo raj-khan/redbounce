@@ -18,4 +18,21 @@ test.describe("smoke", () => {
     await page.waitForTimeout(500);
     expect(errors).toEqual([]);
   });
+
+  test("keyboard input drives the game without errors", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("#game-canvas").click();
+    await page.keyboard.down("ArrowRight");
+    await page.waitForTimeout(400);
+    await page.keyboard.up("ArrowRight");
+    await page.keyboard.down("KeyA");
+    await page.waitForTimeout(200);
+    await page.keyboard.up("KeyA");
+    await page.keyboard.press("KeyP"); // pause
+    await page.waitForTimeout(150);
+    await page.keyboard.press("KeyP"); // resume
+    await page.keyboard.press("KeyR"); // restart
+    await page.waitForTimeout(200);
+    await expect(page.locator("#game-canvas")).toBeVisible();
+  });
 });

@@ -7,7 +7,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
   use: {
-    baseURL: "http://localhost:4173",
+    baseURL: "http://localhost:4177",
     trace: "on-first-retry",
   },
   projects: [
@@ -15,8 +15,8 @@ export default defineConfig({
     { name: "mobile", use: { ...devices["Pixel 7"] } },
   ],
   webServer: {
-    command: "npm run preview",
-    url: "http://localhost:4173",
+    command: "pnpm exec vite preview --port 4177 --strictPort",
+    url: "http://localhost:4177",
     reuseExistingServer: !process.env.CI,
   },
 });

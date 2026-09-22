@@ -1,9 +1,10 @@
 ---
 id: TASK-47
 title: Implement audio unlock
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-09-22 12:31'
+updated_date: '2026-09-22 14:22'
 labels:
   - audio
 milestone: m-3
@@ -25,3 +26,9 @@ Web Audio unlock after first user gesture with autoplay-restriction handling per
 - [ ] #1 Audio starts only after a user gesture
 - [ ] #2 Audio init failure never stops gameplay
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Gesture unlock via pointerdown/keydown, idempotent, failure degrades to silence.
+<!-- SECTION:FINAL_SUMMARY:END -->

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="RedBounce - a fast, playful 2D bouncing adventure built for the browser"
+    />
+    <meta name="theme-color" content="#1a1c2c" />
+    <title>RedBounce</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="stylesheet" href="./src/styles/global.css" />
+    <link rel="stylesheet" href="./src/styles/game.css" />
+    <link rel="stylesheet" href="./src/styles/ui.css" />
+  </head>
+  <body>
+    <div id="app" class="app">
+      <canvas id="game-canvas" class="game-canvas" aria-label="RedBounce game canvas"></canvas>
+      <div id="ui-root" class="ui-root"></div>
+      <div id="touch-controls" class="touch-controls" hidden>
+        <button class="touch-btn touch-left" data-action="move-left" aria-label="Move left">
+          &#9664;
+        </button>
+        <button class="touch-btn touch-right" data-action="move-right" aria-label="Move right">
+          &#9654;
+        </button>
+        <button class="touch-btn touch-pause" data-action="pause" aria-label="Pause">
+          &#10073;&#10073;
+        </button>
+      </div>
+    </div>
+    <noscript>
+      <p>RedBounce requires JavaScript to run.</p>
+    </noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

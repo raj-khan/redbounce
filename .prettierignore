@@ -1,0 +1,11 @@
+# Backlog.md CLI manages its own formatting
+backlog/
+
+# Large external spec document
+bounce_browser_game_a2z_architecture.md
+
+# Generated
+pnpm-lock.yaml
+dist/
+coverage/
+playwright-report/

@@ -1,0 +1,48 @@
+/* HTML overlay UI (menus, touch controls) rendered above the canvas */
+.ui-root {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.ui-root > * {
+  pointer-events: auto;
+}
+
+.touch-controls {
+  position: fixed;
+  inset: auto 0 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-bottom))
+    max(12px, env(safe-area-inset-left));
+  pointer-events: none;
+}
+
+.touch-btn {
+  pointer-events: auto;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid rgba(244, 244, 244, 0.7);
+  background: rgba(26, 28, 44, 0.55);
+  color: var(--color-fg);
+  font-size: 22px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.touch-btn:active {
+  background: rgba(239, 125, 87, 0.55);
+}
+
+.touch-pause {
+  width: 48px;
+  height: 48px;
+  font-size: 14px;
+}

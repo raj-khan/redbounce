@@ -1,9 +1,10 @@
 ---
 id: TASK-7
 title: Add architecture documentation
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-09-22 12:31'
+updated_date: '2026-09-22 13:37'
 labels:
   - foundation
 milestone: m-0
@@ -22,5 +23,11 @@ Distill bounce_browser_game_a2z_architecture.md into docs/architecture.md, gamep
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 docs folder contains architecture, gameplay, and level-design documents
+- [x] #1 docs folder contains architecture, gameplay, and level-design documents
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+docs/architecture.md, docs/gameplay.md, docs/level-design.md distilled from the A2Z spec.
+<!-- SECTION:FINAL_SUMMARY:END -->

@@ -1,0 +1,26 @@
+---
+id: TASK-70
+title: Add app icons
+status: To Do
+assignee: []
+created_date: '2026-09-22 12:31'
+labels:
+  - pwa
+milestone: m-5
+dependencies:
+  - TASK-69
+priority: low
+type: feature
+ordinal: 70000
+---
+
+## Description
+
+<!-- SECTION:DESCRIPTION:BEGIN -->
+App icons for manifest across required sizes per spec section 28.
+<!-- SECTION:DESCRIPTION:END -->
+
+## Acceptance Criteria
+<!-- AC:BEGIN -->
+- [ ] #1 Icons render correctly on install prompts
+<!-- AC:END -->

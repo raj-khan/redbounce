@@ -1,9 +1,10 @@
 ---
 id: TASK-60
 title: Implement moving platforms
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-09-22 12:31'
+updated_date: '2026-09-22 18:02'
 labels:
   - gameplay
 milestone: m-4
@@ -25,3 +26,9 @@ Platforms moving between start and end points with easing, updated before collis
 - [ ] #1 Player rides moving platforms without sliding through
 - [ ] #2 Movement updates before collision resolution
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Oscillating platforms with smooth/linear easing, updated before collision resolution; riders carried by platform delta; oscillation + reset tests.
+<!-- SECTION:FINAL_SUMMARY:END -->

@@ -5,6 +5,7 @@ import { CanvasRenderer } from "../rendering/CanvasRenderer";
 import { BackgroundRenderer } from "../rendering/BackgroundRenderer";
 import { PlayScene } from "./PlayScene";
 import { level01 } from "../levels/Level";
+import { ALL_LEVELS } from "../levels/levels";
 import { LevelRegistry } from "../levels/LevelRegistry";
 import { LevelLoader } from "../levels/LevelLoader";
 import { LocalStorageSaveRepository } from "../save/LocalStorageSaveRepository";
@@ -41,7 +42,7 @@ export class GameApplication {
   constructor(canvas: HTMLCanvasElement, uiRoot: HTMLElement) {
     this.renderer = new CanvasRenderer(canvas);
     this.uiRootElement = uiRoot;
-    this.registry.register(level01);
+    for (const level of ALL_LEVELS) this.registry.register(level);
     this.loader = new LevelLoader(this.registry);
     this.saves = LocalStorageSaveRepository.create(level01.id);
     this.input = InputManager.createForBrowser(document);

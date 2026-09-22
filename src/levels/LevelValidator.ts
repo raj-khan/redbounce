@@ -89,8 +89,20 @@ export function validateLevel(level: unknown): string[] {
       if (!isVec2(entity.center) || !isPositiveNumber(entity.orbitRadius)) {
         errors.push(`${label} (${entity.id}): orbital requires center and orbitRadius`);
       }
+    } else if (
+      entity.type === "saw" ||
+      entity.type === "falling-rock" ||
+      entity.type === "chaser"
+    ) {
+      if (!isVec2(entity) || !isPositiveNumber((entity as { radius?: unknown }).radius)) {
+        errors.push(
+          `${label} (${(entity as { id?: string }).id ?? "?"}): ${(entity as { type?: string }).type} requires x, y, and radius`,
+        );
+      }
     } else if (!isRect(entity)) {
-      errors.push(`${label} (${entity.id}): ${entity.type} requires x, y, width, height`);
+      errors.push(
+        `${label} (${(entity as { id?: string }).id ?? "?"}): ${(entity as { type?: string }).type} requires x, y, width, height`,
+      );
     }
 
     if (isPlatformEntity(entity as EntityDefinition) && isRect(entity)) {

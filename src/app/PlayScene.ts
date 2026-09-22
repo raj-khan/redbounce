@@ -40,7 +40,14 @@ export class PlayScene implements GameScene {
     this.getInput = getInput;
   }
 
+  /** Screen transition state: 1 = fully black, decays to 0 (spec Phase 4). */
+  private fade = 1;
+  /** Completion flash: 1 = bright, decays to 0. */
+  private completionFlash = 0;
+  private completionHandled = false;
+
   enter(): void {
+    this.fade = 1;
     this.camera.setBounds({
       minX: this.world.level.camera.minX,
       maxX: this.world.level.camera.maxX,
@@ -52,6 +59,13 @@ export class PlayScene implements GameScene {
   }
 
   update(deltaSeconds: number): void {
+    if (this.fade > 0) this.fade = Math.max(0, this.fade - deltaSeconds * 2.5);
+    if (this.completionFlash > 0)
+      this.completionFlash = Math.max(0, this.completionFlash - deltaSeconds * 2);
+    if (this.world.completed && !this.completionHandled) {
+      this.completionHandled = true;
+      this.completionFlash = 1;
+    }
     this.world.step(deltaSeconds, this.getInput());
     this.camera.update(deltaSeconds);
     this.camera.follow(
@@ -84,8 +98,38 @@ export class PlayScene implements GameScene {
         kind: platform.oneWay ? "one-way" : "static",
       });
     }
+    for (const moving of this.world.movingPlatforms) {
+      this.entities.drawPlatform(r, {
+        x: moving.rect.x,
+        y: moving.rect.y,
+        width: moving.rect.width,
+        height: moving.rect.height,
+        material: moving.material,
+        kind: "moving",
+      });
+    }
+    for (const breakable of this.world.breakables) {
+      if (breakable.state === "broken") continue;
+      this.entities.drawPlatform(r, {
+        x: breakable.rect.x,
+        y: breakable.rect.y,
+        width: breakable.rect.width,
+        height: breakable.rect.height,
+        kind: "breakable",
+        cracked: breakable.state === "cracking",
+      });
+    }
+    for (const pad of this.world.bouncePads) {
+      this.entities.drawBouncePad(r, pad);
+    }
+    for (const zone of this.world.windZones) {
+      this.entities.drawWindZone(r, zone, time);
+    }
     for (const hazard of this.world.hazards) {
       this.entities.drawHazard(r, hazard);
+    }
+    for (const enemy of this.world.enemies) {
+      this.entities.drawEnemy(r, enemy, time);
     }
     for (const checkpoint of this.world.checkpoints) {
       this.entities.drawCheckpoint(r, checkpoint);
@@ -110,6 +154,8 @@ export class PlayScene implements GameScene {
       phase: p.bounceCount,
     });
 
+    this.entities.drawParticles(r, this.world.particles.activeParticles());
+
     // Screen-space HUD.
     r.applyScreenTransform();
     r.fillTextScreen(this.world.level.name.toUpperCase(), 4, 4, "#f4f4f4", 8);
@@ -130,6 +176,20 @@ export class PlayScene implements GameScene {
     );
     if (this.world.hasKey) {
       r.fillTextScreen("KEY", 4, 24, PALETTE.key, 8);
+    }
+
+    // Screen transition overlay.
+    if (this.fade > 0 || this.world.completed) {
+      r.applyScreenTransform();
+      const { ctx } = r;
+      if (this.fade > 0) {
+        ctx.fillStyle = `rgba(10,12,24,${this.fade})`;
+        ctx.fillRect(0, 0, r.logicalWidth, r.logicalHeight);
+      }
+      if (this.completionFlash > 0) {
+        ctx.fillStyle = `rgba(255,255,255,${this.completionFlash * 0.5})`;
+        ctx.fillRect(0, 0, r.logicalWidth, r.logicalHeight);
+      }
     }
 
     // Debug overlay (development only).

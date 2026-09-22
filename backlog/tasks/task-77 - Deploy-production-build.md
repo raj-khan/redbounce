@@ -1,9 +1,10 @@
 ---
 id: TASK-77
 title: Deploy production build
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2026-09-22 12:32'
+updated_date: '2026-09-22 18:02'
 labels:
   - release
 milestone: m-5

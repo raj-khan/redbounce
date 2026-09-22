@@ -1,9 +1,10 @@
 ---
 id: TASK-51
 title: Add mute setting
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-09-22 12:31'
+updated_date: '2026-09-22 14:22'
 labels:
   - audio
 milestone: m-3
@@ -24,3 +25,9 @@ Mute toggle with M key and settings UI per spec sections 22 and 23.
 <!-- AC:BEGIN -->
 - [ ] #1 Mute silences all audio and persists
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+M key + settings mute toggle; stops music, persists via save.
+<!-- SECTION:FINAL_SUMMARY:END -->

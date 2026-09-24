@@ -6,14 +6,22 @@ The player controls a red ball that bounces automatically whenever it lands on
 a bounceable surface. The player steers left/right, collects rings and stars,
 avoids hazards, activates checkpoints, and reaches the level exit.
 
-## Player physics (defaults)
+## Player physics (retuned for feel)
+
+The spec's initial values produced a ~35px bounce - too low to clear the
+campaign's platforms. Retuned (spec section 11 explicitly allows this):
 
 ```ts
-radius: 7, maxHorizontalSpeed: 90, horizontalAcceleration: 480,
-horizontalDeceleration: 600, gravity: 520, terminalVelocity: 260,
-bounceVelocity: -190, airControl: 0.8, coyoteTimeSeconds: 0.08,
+radius: 7, maxHorizontalSpeed: 120, horizontalAcceleration: 620,
+horizontalDeceleration: 800, gravity: 700, terminalVelocity: 320,
+bounceVelocity: -340, airControl: 0.85, coyoteTimeSeconds: 0.08,
 jumpBufferSeconds: 0.1
 ```
+
+Bounce height is now ~83px (~46% of the viewport) and horizontal reach
+per arc is ~110px. Level spacing rules: step-ups <= 45px, gaps <= 60px;
+all 10 levels are proven solvable by a physics-model BFS in
+`tests/unit/levels/Solvability.spec.ts`.
 
 ## Player states
 

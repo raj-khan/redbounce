@@ -102,6 +102,9 @@ export class AudioManager {
 
   playMusic(trackName = "meadow", _options: PlayMusicOptions = {}): void {
     if (!this.context || !this.musicGain || this.muted) return;
+    // Never restart a track that is already playing (spec section 23:
+    // music must not stutter on input or re-entry).
+    if (this.musicTimer !== null && this.musicTrackName === trackName) return;
     this.stopMusic();
     this.musicTrackName = MUSIC_TRACKS[trackName] ? trackName : "meadow";
     const track = MUSIC_TRACKS[this.musicTrackName]!;
@@ -133,6 +136,16 @@ export class AudioManager {
 
   isMusicPlaying(): boolean {
     return this.musicTimer !== null;
+  }
+
+  /** Name of the current track ("" when stopped). */
+  currentTrackName(): string {
+    return this.musicTimer !== null ? this.musicTrackName : "";
+  }
+
+  /** Sequencer step index; exposed for tests. */
+  sequencerStep(): number {
+    return this.musicStep;
   }
 
   setMasterVolume(value: number): void {

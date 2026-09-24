@@ -217,7 +217,10 @@ export class GameApplication {
   }
 
   private unlockAudio = (): void => {
+    if (this.audio.isUnlocked()) return; // one-time gesture unlock
     void this.audio.unlock().then(() => {
+      window.removeEventListener("pointerdown", this.unlockAudio);
+      window.removeEventListener("keydown", this.unlockAudio);
       if (!this.audio.isMuted() && this.states.current() === "playing") this.startLevelMusic();
     });
   };
@@ -302,7 +305,7 @@ export class GameApplication {
     const scene = this.scenes.current();
     if (scene instanceof PlayScene) {
       scene.world.reset();
-      this.renderer.camera.snapTo(scene.world.player.x, scene.world.player.y);
+      this.renderer.camera.snapTo(scene.world.player.x, scene.world.player.lastGroundY);
     }
   }
 

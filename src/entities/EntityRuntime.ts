@@ -287,7 +287,7 @@ export function toRuntimeBouncePads(level: LevelDefinition): BouncePadRuntime[] 
     .map((entity) => ({
       id: entity.id,
       rect: { x: entity.x, y: entity.y, width: entity.width, height: entity.height },
-      velocity: entity.velocity ?? -330,
+      velocity: entity.velocity ?? -430,
       flash: 0,
     }));
 }

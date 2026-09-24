@@ -10,9 +10,11 @@ export type CameraBounds = {
 
 export type CameraConfigOverrides = Partial<{
   followSpeed: number;
+  verticalFollowSpeed: number;
   lookAheadDistance: number;
   deadZoneWidth: number;
   deadZoneHeight: number;
+  verticalRetargetThreshold: number;
 }>;
 
 /**
@@ -41,7 +43,12 @@ export class Camera {
   ) {
     this.viewportWidth = viewportWidth;
     this.viewportHeight = viewportHeight;
-    this.config = { ...CAMERA_CONFIG, ...overrides };
+    this.config = {
+      ...CAMERA_CONFIG,
+      verticalFollowSpeed: 4,
+      verticalRetargetThreshold: 20,
+      ...overrides,
+    };
   }
 
   setBounds(bounds: CameraBounds): void {
@@ -55,6 +62,52 @@ export class Camera {
     this.targetY = worldY - this.viewportHeight / 2;
     this.x = this.targetX;
     this.y = this.targetY;
+    this.clampToBounds();
+  }
+
+  /**
+   * Stable platformer follow: tracks the GROUND CONTACT height instead of
+   * the ball mid-air, so routine bounces never move the camera and the
+   * world does not appear to bounce with the ball (spec section 19:
+   * avoid excessive camera motion).
+   *
+   * `groundY` is the y of the surface the player last touched; while the
+   * player falls far below it (pits), the camera chases the player instead.
+   */
+  followStable(
+    targetX: number,
+    targetY: number,
+    groundY: number,
+    velocityX: number,
+    deltaSeconds: number,
+  ): void {
+    // Horizontal: identical to follow().
+    this.followHorizontal(targetX, velocityX, deltaSeconds);
+
+    // Vertical: base the target on the ground line, not the arc.
+    let baseY = groundY;
+    if (targetY > groundY + 80) baseY = targetY; // falling into a pit
+    const desiredY = baseY - this.viewportHeight / 2;
+    // Only retarget when the ground level meaningfully changed (climbing).
+    if (Math.abs(desiredY - this.targetY) > this.config.verticalRetargetThreshold) {
+      this.targetY = desiredY;
+    }
+    const t = 1 - Math.exp(-this.config.verticalFollowSpeed * deltaSeconds);
+    this.y = lerp(this.y, this.targetY, t);
+    this.clampToBounds();
+  }
+
+  private followHorizontal(targetX: number, velocityX: number, deltaSeconds: number): void {
+    const lookAhead =
+      Math.sign(velocityX) * Math.min(Math.abs(velocityX) / 120, 1) * this.config.lookAheadDistance;
+    const desiredX = targetX + lookAhead - this.viewportWidth / 2;
+    const centerX = this.x + this.viewportWidth / 2;
+    const deadHalfW = this.config.deadZoneWidth / 2;
+    if (targetX < centerX - deadHalfW || targetX > centerX + deadHalfW) {
+      this.targetX = desiredX;
+    }
+    const t = 1 - Math.exp(-this.config.followSpeed * deltaSeconds);
+    this.x = lerp(this.x, this.targetX, t);
     this.clampToBounds();
   }
 

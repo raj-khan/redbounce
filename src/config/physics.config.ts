@@ -3,7 +3,7 @@ export const PHYSICS_CONFIG = {
   /** Simulation rate. */
   fixedDeltaSeconds: 1 / 60,
   /** Gravity pulls the player down (y grows downward). */
-  gravity: 520,
+  gravity: 700,
   /** Maximum falling speed. */
-  terminalVelocity: 260,
+  terminalVelocity: 320,
 } as const;

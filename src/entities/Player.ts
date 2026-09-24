@@ -32,12 +32,18 @@ export class Player {
   coyoteTimer = 0;
   jumpBuffer = 0;
   bounceCount = 0;
+  /**
+   * Y of the surface the player last touched. The camera follows this
+   * instead of the mid-air arc so the world does not bounce with the ball.
+   */
+  lastGroundY: number;
 
   private readonly config: PlayerConfig;
 
   constructor(spawnX: number, spawnY: number, config: PlayerConfig = PLAYER_DEFAULTS) {
     this.x = spawnX;
     this.y = spawnY;
+    this.lastGroundY = spawnY;
     this.radius = config.radius;
     this.config = config;
   }
@@ -104,12 +110,14 @@ export class Player {
     this.squashAnim = 1;
     this.jumpBuffer = this.config.jumpBufferSeconds;
     this.bounceCount++;
+    this.lastGroundY = this.y + this.radius;
   }
 
   /** Reset to a spawn point with a fresh runtime state (respawn/restart). */
   reset(spawnX: number, spawnY: number, invulnerable = false): void {
     this.x = spawnX;
     this.y = spawnY;
+    this.lastGroundY = spawnY;
     this.vx = 0;
     this.vy = 0;
     this.state = "normal";

@@ -43,6 +43,17 @@ describe("GameStateMachine", () => {
     expect(listener).toHaveBeenCalledWith("playing", "paused");
   });
 
+  it("game-complete can replay into playing (level advance after finale)", () => {
+    const sm = new GameStateMachine("game-complete");
+    expect(sm.transition("playing")).toBe(true);
+  });
+
+  it("level-complete returns to playing (level advance)", () => {
+    const sm = new GameStateMachine("level-complete");
+    expect(sm.transition("playing")).toBe(true);
+    expect(sm.current()).toBe("playing");
+  });
+
   it("disposer removes listener", () => {
     const sm = new GameStateMachine("playing");
     const listener = vi.fn();

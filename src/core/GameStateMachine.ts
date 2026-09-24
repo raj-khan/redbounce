@@ -25,7 +25,7 @@ export const GAME_STATE_TRANSITIONS: Readonly<Record<GameState, readonly GameSta
   paused: ["playing", "level-select", "main-menu", "settings"],
   "player-dead": ["playing", "level-select", "main-menu"],
   "level-complete": ["playing", "level-select", "main-menu", "game-complete", "loading"],
-  "game-complete": ["main-menu", "level-select"],
+  "game-complete": ["main-menu", "level-select", "playing"],
   settings: ["main-menu", "level-select", "paused", "playing"],
 };
 

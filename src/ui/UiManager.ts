@@ -232,6 +232,9 @@ export class UiManager {
         <p>TIME <strong>${result.completionTimeSeconds.toFixed(1)}s</strong></p>
         ${objectives}
       </div>
+      <p class="auto-hint">${
+        hasNext ? "next level starts automatically&hellip;" : "all levels complete!"
+      }</p>
       <div class="menu" role="menu">
         ${hasNext ? `<button class="menu-btn" data-action="next" role="menuitem">NEXT LEVEL</button>` : ""}
         <button class="menu-btn" data-action="replay" role="menuitem">REPLAY</button>
@@ -242,7 +245,11 @@ export class UiManager {
     this.onClick(screen, "[data-action=next]", () => this.handlers.onNextLevel());
     this.onClick(screen, "[data-action=replay]", () => this.handlers.onRestart());
     this.onClick(screen, "[data-action=levels]", () => this.requestLevelSelect?.());
-    this.announce(`Level complete. Score ${result.score}.`);
+    this.announce(
+      hasNext
+        ? `Level complete. Score ${result.score}. Next level starting.`
+        : `Level complete. Score ${result.score}. All levels complete!`,
+    );
     this.focusFirst(screen);
   }
 

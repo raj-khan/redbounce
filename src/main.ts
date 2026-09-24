@@ -22,6 +22,11 @@ function boot(): void {
   const app = new GameApplication(canvas, uiRoot);
   app.start();
   registerServiceWorker();
+
+  // Dev/test-only introspection hook; stripped from production builds.
+  if (import.meta.env.DEV) {
+    (window as unknown as { __redbounce?: GameApplication }).__redbounce = app;
+  }
 }
 
 if (document.readyState === "loading") {

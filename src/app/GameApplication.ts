@@ -38,6 +38,9 @@ export class GameApplication {
   private save: SaveData | null = null;
   private disposed = false;
   private currentInput: PlayerInput = { left: false, right: false };
+  /** Guards against double-advance (Enter fires button + key handler). */
+  private advancingLevel = false;
+  private autoAdvanceTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(canvas: HTMLCanvasElement, uiRoot: HTMLElement) {
     this.renderer = new CanvasRenderer(canvas);
@@ -87,6 +90,7 @@ export class GameApplication {
 
   stop(): void {
     this.disposed = true;
+    this.clearAutoAdvance();
     this.loop.stop();
     this.audio.stopMusic();
     this.input.dispose();
@@ -147,6 +151,7 @@ export class GameApplication {
 
   private restartFromMenu(): void {
     this.ui.hideAll();
+    this.clearAutoAdvance();
     if (this.states.current() === "paused") {
       this.states.transition("playing");
       this.loop.resume();
@@ -155,6 +160,7 @@ export class GameApplication {
   }
 
   private toMainMenu(): void {
+    this.clearAutoAdvance();
     this.ui.hideAll();
     this.loop.stop();
     this.audio.stopMusic();
@@ -252,7 +258,10 @@ export class GameApplication {
     this.wireScene(play);
     this.scenes.register("play", () => play);
     await this.scenes.switchTo("play");
-    if (this.states.current() === "level-select" || this.states.current() === "main-menu") {
+    // Land in "playing" from every entry state (loading, menus,
+    // level-complete, game-complete, settings). Previously the state stuck
+    // at "level-complete", silently disabling music, pause, and restart.
+    if (this.states.current() !== "playing") {
       this.states.transition("playing");
     }
     if (!this.loop.isRunning()) this.loop.start();
@@ -287,18 +296,43 @@ export class GameApplication {
     this.save.updatedAt = Date.now();
     await this.saves.save(this.save);
     this.ui.showCompletion(scene.world.result, Boolean(next));
+    if (next) {
+      // Auto-continue after a short results beat (classic Bounce flow).
+      this.clearAutoAdvance();
+      this.autoAdvanceTimer = setTimeout(() => void this.advanceLevel(), 2500);
+    } else {
+      this.ui.announce("All levels complete!");
+    }
+  }
+
+  private clearAutoAdvance(): void {
+    if (this.autoAdvanceTimer !== null) {
+      clearTimeout(this.autoAdvanceTimer);
+      this.autoAdvanceTimer = null;
+    }
   }
 
   /** Confirm after completion: advance to the next unlocked level. */
   private async advanceLevel(): Promise<void> {
+    if (this.advancingLevel) return; // Enter fires the button AND the key
     const scene = this.scenes.current();
     if (!(scene instanceof PlayScene) || !scene.world.completed) return;
     const currentId = scene.world.level.id;
     const next = this.registry.next(currentId);
-    const target = next ? next.id : this.registry.first()?.id;
-    if (!target) return;
-    if (this.states.current() === "playing") this.states.transition("level-complete");
-    await this.startLevel(target);
+    if (!next) {
+      // Final level: game complete, stay on the results screen.
+      if (this.states.current() === "playing") this.states.transition("level-complete");
+      if (this.states.current() === "level-complete") this.states.transition("game-complete");
+      return;
+    }
+    this.advancingLevel = true;
+    this.clearAutoAdvance();
+    try {
+      if (this.states.current() === "playing") this.states.transition("level-complete");
+      await this.startLevel(next.id);
+    } finally {
+      this.advancingLevel = false;
+    }
   }
 
   private restartLevel(): void {

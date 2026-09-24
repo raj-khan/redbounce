@@ -68,9 +68,11 @@ export class PlayScene implements GameScene {
     }
     this.world.step(deltaSeconds, this.getInput());
     this.camera.update(deltaSeconds);
-    this.camera.follow(
+    // Follow the ground line, not the arc: bounces never move the camera.
+    this.camera.followStable(
       this.world.player.x,
       this.world.player.y,
+      this.world.player.lastGroundY,
       this.world.player.vx,
       deltaSeconds,
     );

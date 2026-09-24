@@ -117,7 +117,7 @@ describe("Bounce pads", () => {
       makeLevel([
         FLOOR,
         EXIT,
-        { id: "pad", type: "bounce-pad", x: 80, y: 374, width: 40, height: 6, velocity: -330 },
+        { id: "pad", type: "bounce-pad", x: 80, y: 374, width: 40, height: 6, velocity: -440 },
       ]),
     );
     // Drop the player straight onto the pad.
@@ -128,10 +128,10 @@ describe("Bounce pads", () => {
       maxY = Math.min(maxY, world.player.y);
       if (world.player.vy < 0) maxVy = Math.min(maxVy, world.player.vy);
     }
-    // Pad launch (-330) must exceed the regular bounce (-190).
-    expect(maxVy).toBeLessThanOrEqual(-300);
-    // Reaches much higher than a normal bounce (~35px).
-    expect(374 - maxY).toBeGreaterThan(80);
+    // Pad launch (-440) must exceed the regular bounce (-340).
+    expect(maxVy).toBeLessThanOrEqual(-400);
+    // Reaches much higher than a normal bounce (~83px).
+    expect(374 - maxY).toBeGreaterThan(100);
   });
 });
 

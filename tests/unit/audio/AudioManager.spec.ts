@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { AudioManager, type AudioContextLike } from "../../../src/audio/AudioManager";
 
 /** Fake Web Audio graph recording node activity. */
@@ -109,6 +109,49 @@ describe("AudioManager", () => {
     manager.playMusic("meadow");
     manager.setMuted(true);
     expect(manager.isMusicPlaying()).toBe(false);
+  });
+
+  it("replaying the same track never restarts it (no stutter on input)", async () => {
+    vi.useFakeTimers();
+    try {
+      const { manager, ctx } = makeManager();
+      await manager.unlock();
+      manager.playMusic("meadow");
+      expect(manager.isMusicPlaying()).toBe(true);
+
+      // Let the sequencer advance a few steps.
+      vi.advanceTimersByTime(2000);
+      const stepBefore = manager.sequencerStep();
+      expect(stepBefore).toBeGreaterThan(2);
+
+      // Simulate the old bug path: keydown re-triggers playMusic for the
+      // same track. The step counter must continue, not reset to 0.
+      manager.playMusic("meadow");
+      expect(manager.sequencerStep()).toBe(stepBefore);
+      vi.advanceTimersByTime(500);
+      expect(manager.sequencerStep()).toBeGreaterThan(stepBefore);
+      expect(manager.currentTrackName()).toBe("meadow");
+      void ctx;
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("switching to a different track restarts the sequencer", async () => {
+    vi.useFakeTimers();
+    try {
+      const { manager } = makeManager();
+      await manager.unlock();
+      manager.playMusic("meadow");
+      vi.advanceTimersByTime(2000);
+      expect(manager.sequencerStep()).toBeGreaterThan(2);
+
+      manager.playMusic("cave");
+      expect(manager.sequencerStep()).toBe(0);
+      expect(manager.currentTrackName()).toBe("cave");
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("volume setters clamp to [0, 1]", () => {

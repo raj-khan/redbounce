@@ -92,8 +92,20 @@ export class GameWorld {
     return this.collectibles.filter((c) => c.type !== "key").length;
   }
 
-  /** Advance the simulation one fixed step. */
+  /**
+   * Advance the simulation one fixed step. Emits are queued during the
+   * tick and delivered in order at the end (spec section 32: events are
+   * processed in a predictable order each simulation tick).
+   */
   step(deltaSeconds: number, input: PlayerInput): void {
+    try {
+      this.stepInner(deltaSeconds, input);
+    } finally {
+      this.events.drain();
+    }
+  }
+
+  private stepInner(deltaSeconds: number, input: PlayerInput): void {
     if (this.completed) {
       this.particles.update(deltaSeconds);
       return;
